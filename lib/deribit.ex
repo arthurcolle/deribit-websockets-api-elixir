@@ -41,19 +41,15 @@ defmodule Deribit do
   ]
 
   for endpoint <- @public_get do
-    def unquote(String.to_atom(endpoint))(params \\ %{}), do: DeribitHttp.get_public(unquote(endpoint), params)
+    def unquote(String.to_atom(endpoint))(params \\ %{}),
+      do: DeribitWs.get_public(unquote(endpoint), params)
   end
 
   for endpoint <- @private_get do
-    def unquote(String.to_atom(endpoint))(client_id, client_secret, params \\ %{}) do
-      DeribitHttp.get_private(unquote(endpoint), client_id, client_secret, params)
-    end
-
-    def unquote(String.to_atom(endpoint))(params \\ %{}) do
-      DeribitHttp.get_private(unquote(endpoint), client_id(), client_secret(), params)
-    end
+    def unquote(String.to_atom(endpoint))(params \\ %{}),
+      do: DeribitWs.get_private(unquote(endpoint), client_id(), client_secret(), params)
   end
 
-  defp client_id, do: Application.get_env(:deribit, :client_id)
-  defp client_secret, do: Application.get_env(:deribit, :client_secret)
+  def client_id(), do: Application.get_env(:deribit, :client_id)
+  def client_secret(), do: Application.get_env(:deribit, :client_secret)
 end
