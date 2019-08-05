@@ -1,4 +1,9 @@
-defmodule DeribitWs do
+defmodule Deribit.API.WebSockets do
+  @moduledoc """
+    Deribit WebSockets API.
+  """
+
+  require Logger
   @api_v2 "/ws/api/v2"
 
   def start_link do
@@ -6,7 +11,7 @@ defmodule DeribitWs do
       fn ->
         %{
           "websocket" =>
-            Socket.Web.connect!(base_endpoint,
+            Socket.Web.connect!(base_endpoint(),
               path: @api_v2,
               secure: true
             )
@@ -14,6 +19,10 @@ defmodule DeribitWs do
       end,
       name: __MODULE__
     )
+  end
+
+  def socket do
+    Agent.get(__MODULE__, fn x -> Map.get(x, "websocket") end)
   end
 
   def obtain_result(text) do
@@ -74,17 +83,20 @@ defmodule DeribitWs do
 
     new_m =
       Agent.get(__MODULE__, fn data ->
-        ws = Map.get(data, "websocket")
+        websocket = Map.get(data, "websocket")
 
-        case Socket.Web.send!(ws, {:text, M.enc!(payload_for_auth(client_id, client_secret))}) do
+        case Socket.Web.send!(
+               websocket,
+               {:text, M.enc!(payload_for_auth(client_id, client_secret))}
+             ) do
           :ok ->
-            case Socket.Web.recv!(ws) do
+            case Socket.Web.recv!(websocket) do
               {:text, text} ->
                 IO.inspect(text)
                 {:ok, Map.put(data, "result", obtain_result(text))}
 
               {:ping, _} ->
-                {Socket.Web.send!({:pong, ""}), data}
+                {Socket.Web.send!(websocket, {:pong, ""}), data}
 
               abc ->
                 IO.inspect(abc)
@@ -133,19 +145,22 @@ defmodule DeribitWs do
   def get_public(url, params \\ %{}) do
     Agent.get(__MODULE__, fn data ->
       IO.inspect(data)
-      ws = Map.get(data, "websocket")
+      websocket = Map.get(data, "websocket")
       IO.inspect(params)
 
-      # DeribitWs.start_link(); DeribitWs.authenticate(Deribit.client_id(), Deribit.client_secret())
-
-      case Socket.Web.send!(
-             ws,
-             {:text, M.enc!(base_method(:public, url, params))}
-           ) do
+      case Socket.Web.send!(websocket, {:text, M.enc!(base_method(:public, url, params))}) do
         :ok ->
-          case Socket.Web.recv!(ws) do
-            {:text, text} -> {:ok, M.dec!(text)}
-            {:ping, _} -> Socket.Web.send!({:pong, ""})
+          case Socket.Web.recv!(websocket) do
+            {:text, text} ->
+              IO.inspect(M.dec!(text))
+              # M.dec!(text),
+              {:ok, spawn(Deribit.Listener, :listen, [websocket])}
+
+            {:ping, _} ->
+              Socket.Web.send!(websocket, {:pong, ""})
+
+            other ->
+              IO.inspect(other)
           end
       end
     end)
@@ -158,17 +173,14 @@ defmodule DeribitWs do
         |> Map.get("result")
         |> Map.get("access_token")
 
-      ws = Map.get(data, "websocket")
+      websocket = Map.get(data, "websocket")
       params = Map.put(params, "access_token", access_token)
 
-      case Socket.Web.send!(
-             ws,
-             {:text, M.enc!(base_method(:private, url, params))}
-           ) do
+      case Socket.Web.send!(websocket, {:text, M.enc!(base_method(:private, url, params))}) do
         :ok ->
-          case Socket.Web.recv!(ws) do
+          case Socket.Web.recv!(websocket) do
             {:text, text} -> {:ok, M.dec!(text)}
-            {:ping, _} -> Socket.Web.send!({:pong, ""})
+            {:ping, _} -> Socket.Web.send!(websocket, {:pong, ""})
           end
       end
     end)

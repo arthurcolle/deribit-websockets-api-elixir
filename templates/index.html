@@ -1,0 +1,28 @@
+<html>
+    <body>
+    <script>
+        var msg =
+{
+  "jsonrpc" : "2.0",
+  "id" : 4235,
+  "method" : "public/subscribe",
+  "params" : {
+    "channels" : [
+      "deribit_price_index.btc_usd"
+    ]
+  }
+};
+var ws = new WebSocket('wss://test.deribit.com/ws/api/v2');
+ws.onmessage = function (e) {
+    console.log('received from server : ', e.data);
+};
+ws.onopen = function () {
+    // -------------------
+    // Before sending message, make sure that your connection
+    // is authenticated (use public/auth call before)
+    // -------------------
+    ws.send(JSON.stringify(msg));
+};
+</script>
+    </body>
+</html>

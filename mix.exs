@@ -5,7 +5,7 @@ defmodule Deribit.MixProject do
     [
       app: :deribit,
       version: "0.2.1",
-      elixir: "~> 1.8",
+      elixir: "~> 1.9.1",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       name: "Deribit",
@@ -35,7 +35,8 @@ defmodule Deribit.MixProject do
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:httpoison, "~> 1.4"},
       {:jason, "~> 1.1"},
-      {:socket, "~> 0.3.13"}
+      {:socket, "~> 0.3.13"},
+      {:websockex, "~> 0.4.2"}
     ]
   end
 end

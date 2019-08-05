@@ -1,9 +1,9 @@
 defmodule Deribit do
   @moduledoc """
-  Wrapper for the Deribit API
+   Deribit API client
   """
 
-  @public_get [
+  @public [
     "auth",
     "get_time",
     "test",
@@ -24,10 +24,12 @@ defmodule Deribit do
     "get_last_trades_by_instrument_and_time",
     "get_order_book",
     "get_trade_volumes",
-    "ticker"
+    "ticker",
+    "subscribe",
+    "unsubscribe"
   ]
 
-  @private_get [
+  @private [
     "get_subaccounts",
     "get_account_summary",
     "get_email_language",
@@ -37,17 +39,35 @@ defmodule Deribit do
     "get_current_deposit_address",
     "get_deposits",
     "get_transfers",
-    "get_withdrawals"
+    "get_withdrawals",
+    "buy",
+    "sell",
+    "edit",
+    "cancel",
+    "cancel_all",
+    "cancel_all_by_currency",
+    "cancel_all_by_instrument",
+    "close_positions",
+    "get_margins",
+    "get_open_orders_by_currency",
+    "get_open_orders_by_instrument",
+    "get_order_history_by_currency"
   ]
 
-  for endpoint <- @public_get do
+  for endpoint <- @public do
     def unquote(String.to_atom(endpoint))(params \\ %{}),
-      do: DeribitWs.get_public(unquote(endpoint), params)
+      do: Deribit.API.WebSockets.get_public(unquote(endpoint), params)
   end
 
-  for endpoint <- @private_get do
+  for endpoint <- @private do
     def unquote(String.to_atom(endpoint))(params \\ %{}),
-      do: DeribitWs.get_private(unquote(endpoint), client_id(), client_secret(), params)
+      do:
+        Deribit.API.WebSockets.get_private(
+          unquote(endpoint),
+          client_id(),
+          client_secret(),
+          params
+        )
   end
 
   def client_id(), do: Application.get_env(:deribit, :client_id)

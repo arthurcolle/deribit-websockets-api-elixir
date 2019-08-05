@@ -6,6 +6,8 @@ if File.exists?("config/key.secret.exs") do
   import_config "key.secret.exs"
 end
 
+config :logger, level: :info
+
 config :deribit,
   base_url: "www.deribit.com",
   test_url: "test.deribit.com",

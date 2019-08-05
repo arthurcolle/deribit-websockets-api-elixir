@@ -85,3 +85,11 @@ iex(2)> Deribit.get_account_summary("client_id", "client_secret", %{currency: "b
     "usOut" => 1556925927518933
   }}}
 ```
+
+### Quick how to use
+```
+iex(1)> Deribit.API.WebSockets.start_link(); Deribit.API.WebSockets.authenticate(Deribit.client_id(), Deribit.client_secret())
+```
+```
+iex(2)> Deribit.subscribe(%{"channels" => ["book.BTC-27DEC19-11000-C.raw"]})
+```

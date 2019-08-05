@@ -1,12 +1,12 @@
-defmodule DeribitHttp do
+defmodule Deribit.API.HTTP do
   @moduledoc """
-  Handles HTTP requests to the Deribit API
+    Deribit HTTP API.
   """
 
   @api_v2 "/api/v2"
 
   def get_public(url, params \\ %{}) do
-    base_endpoint() <> @api_v2 <> "/public/" <> url
+    (base_endpoint() <> @api_v2 <> "/public/" <> url)
     |> add_url_params(params)
     |> HTTPoison.get()
     |> parse_response()
@@ -16,7 +16,7 @@ defmodule DeribitHttp do
     url = add_url_params(@api_v2 <> "/private/" <> url, params)
     headers = authorization_headers(url, "", client_id, client_secret)
 
-    base_endpoint() <> url
+    (base_endpoint() <> url)
     |> HTTPoison.get(headers)
     |> parse_response()
   end
@@ -28,7 +28,10 @@ defmodule DeribitHttp do
     text = "#{timestamp}\n#{nonce}\nGET\n#{url}\n#{body}\n"
     signature = :crypto.hmac(:sha256, client_secret, text) |> Base.encode16()
 
-    ["Authorization": "deri-hmac-sha256 id=#{client_id},ts=#{timestamp},nonce=#{nonce},sig=#{signature}"]
+    [
+      Authorization:
+        "deri-hmac-sha256 id=#{client_id},ts=#{timestamp},nonce=#{nonce},sig=#{signature}"
+    ]
   end
 
   defp get_timestamp, do: DateTime.utc_now() |> DateTime.to_unix() |> Kernel.*(1000)
@@ -36,8 +39,12 @@ defmodule DeribitHttp do
   defp add_url_params(url, params) when params == %{}, do: url
   defp add_url_params(url, params), do: url <> "?" <> URI.encode_query(params)
 
-  defp parse_response({:ok, %HTTPoison.Response{status_code: 200, body: body}}), do: Jason.decode(body)
-  defp parse_response({:ok, %HTTPoison.Response{status_code: status, body: body}}), do: {:error, {status, Jason.decode!(body)}}
+  defp parse_response({:ok, %HTTPoison.Response{status_code: 200, body: body}}),
+    do: Jason.decode(body)
+
+  defp parse_response({:ok, %HTTPoison.Response{status_code: status, body: body}}),
+    do: {:error, {status, Jason.decode!(body)}}
+
   defp parse_response({:error, %HTTPoison.Error{reason: reason}}), do: {:error, reason}
 
   defp base_endpoint do

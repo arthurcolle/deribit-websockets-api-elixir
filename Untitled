@@ -1,0 +1,9 @@
+defmodule Rihanna do
+  def work do
+    scale = :random.uniform()
+    {a,b}=Float.ratio((:random.uniform()/scale) / (:random.uniform()/scale))
+    mx=max(a,b)
+    mn=min(a,b)
+    :math.log(mx-mn)
+  end
+end
