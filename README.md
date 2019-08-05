@@ -1,8 +1,7 @@
 # Deribit
 
-Client for the [Deribit API v2](https://docs.deribit.com/v2/) over HTTP.
-
-
+Client for the [Deribit API v2](https://docs.deribit.com/v2/) over a secure WebSocket connection.
+Adaptation and expansion of earlier work done by @gabrielpra1.
 ## Installation
 
 The package can be installed by adding `deribit` to your list of dependencies in `mix.exs`:
