@@ -1,4 +1,4 @@
-defmodule Deribit.API.HTTP do
+defmodule DeribitApi.API.HTTP do
   @moduledoc """
     Deribit HTTP API.
   """

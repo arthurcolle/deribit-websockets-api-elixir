@@ -8,7 +8,7 @@ end
 
 config :logger, level: :info
 
-config :deribit,
+config :deribit_api,
   base_url: "www.deribit.com",
   test_url: "test.deribit.com",
   client_id: System.get_env("DERIBIT_CLIENT_ID"),

@@ -1,4 +1,4 @@
-defmodule Deribit.API do
-  import Deribit.API.HTTP
-  import Deribit.API.WebSockets
+defmodule DeribitApi.API do
+  import DeribitApi.API.HTTP
+  import DeribitApi.API.WebSockets
 end

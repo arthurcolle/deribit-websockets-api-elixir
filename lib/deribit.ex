@@ -1,4 +1,4 @@
-defmodule Deribit do
+defmodule DeribitApi do
   @moduledoc """
    Deribit API client
   """
@@ -55,21 +55,26 @@ defmodule Deribit do
   ]
 
   for endpoint <- @public do
-    def unquote(String.to_atom(endpoint))(params \\ %{}),
-      do: Deribit.API.WebSockets.get_public(unquote(endpoint), params)
+    def unquote(String.to_atom(endpoint))(params \\ %{}, f),
+      do: DeribitApi.API.WebSockets.get_public(
+        unquote(endpoint),
+        params,
+        f
+      )
   end
 
   for endpoint <- @private do
-    def unquote(String.to_atom(endpoint))(params \\ %{}),
+    def unquote(String.to_atom(endpoint))(params \\ %{}, f),
       do:
-        Deribit.API.WebSockets.get_private(
+        DeribitApi.API.WebSockets.get_private(
           unquote(endpoint),
           client_id(),
           client_secret(),
-          params
+          params,
+          f
         )
   end
 
-  def client_id(), do: Application.get_env(:deribit, :client_id)
-  def client_secret(), do: Application.get_env(:deribit, :client_secret)
+  def client_id(), do: Application.get_env(:deribit_api, :client_id)
+  def client_secret(), do: Application.get_env(:deribit_api, :client_secret)
 end

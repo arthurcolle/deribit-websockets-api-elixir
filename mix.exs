@@ -1,11 +1,11 @@
-defmodule Deribit.MixProject do
+defmodule DeribitApi.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :deribit,
-      version: "0.2.3",
-      elixir: "~> 1.9.1",
+      app: :deribit_api,
+      version: "0.4.2",
+      elixir: "~> 1.14.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       name: "Deribit",

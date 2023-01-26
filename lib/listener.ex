@@ -1,6 +1,7 @@
-defmodule Deribit.Listener do
+defmodule DeribitApi.Listener do
   require Logger
 
+  @spec listen(Socket.Web.t(), any, any) :: any
   def listen(websocket, data, f) do
 
     case Socket.Web.recv!(websocket) do
@@ -36,5 +37,5 @@ defmodule Deribit.Listener do
   end
 end
 
-# Deribit.API.WebSockets.start_link(); Deribit.API.WebSockets.authenticate(Deribit.client_id(), Deribit.client_secret())
-# pid = Deribit.subscribe(%{"channels" => ["book.BTC-27DEC19-13000-C.raw"]})
+# DeribitApi.API.WebSockets.start_link(); DeribitApi.API.WebSockets.authenticate(DeribitApi.client_id(), DeribitApi.client_secret())
+# pid = DeribitApi.subscribe(%{"channels" => ["book.BTC-27DEC19-13000-C.raw"]})
