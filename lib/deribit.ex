@@ -55,19 +55,18 @@ defmodule Deribit do
   ]
 
   for endpoint <- @public do
-    def unquote(String.to_atom(endpoint))(params \\ %{}, f),
-      do: Deribit.API.WebSockets.get_public(unquote(endpoint), params, f)
+    def unquote(String.to_atom(endpoint))(params \\ %{}),
+      do: Deribit.API.WebSockets.get_public(unquote(endpoint), params)
   end
 
   for endpoint <- @private do
-    def unquote(String.to_atom(endpoint))(params \\ %{}, f),
+    def unquote(String.to_atom(endpoint))(params \\ %{}),
       do:
         Deribit.API.WebSockets.get_private(
           unquote(endpoint),
           client_id(),
           client_secret(),
-          params,
-          f
+          params
         )
   end
 

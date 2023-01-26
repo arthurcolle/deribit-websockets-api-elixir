@@ -142,7 +142,7 @@ defmodule Deribit.API.WebSockets do
 
   # def ws, do: Agent.get(__MODULE__, fn data -> Map.get(data, "websocket") end)
 
-  def get_public(url, params \\ %{}, f) do
+  def get_public(url, params \\ %{}) do
     Agent.get(__MODULE__, fn data ->
       IO.inspect(data)
       websocket = Map.get(data, "websocket")
@@ -152,11 +152,19 @@ defmodule Deribit.API.WebSockets do
         :ok ->
           case Socket.Web.recv!(websocket) do
             {:text, text} ->
+<<<<<<< HEAD
               parsed_text = M.dec!(text)
               f.(parsed_text)
               {:ok, spawn(Deribit.Listener, :listen, [websocket, data, f])}
+=======
+              IO.inspect(M.dec!(text))
+              # M.dec!(text),
+              {:ok, spawn(Deribit.Listener, :listen, [websocket])}
+
+>>>>>>> parent of 13ee9c5 (Enable arbitrary functions to be passed into the subscribe function instead of just printing out the output)
             {:ping, _} ->
               Socket.Web.send!(websocket, {:pong, ""})
+
             other ->
               IO.inspect(other)
           end
@@ -164,7 +172,7 @@ defmodule Deribit.API.WebSockets do
     end)
   end
 
-  def get_private(url, client_id, client_secret, params \\ %{}, f) do
+  def get_private(url, client_id, client_secret, params \\ %{}) do
     Agent.get(__MODULE__, fn data ->
       access_token =
         data
@@ -177,10 +185,7 @@ defmodule Deribit.API.WebSockets do
       case Socket.Web.send!(websocket, {:text, M.enc!(base_method(:private, url, params))}) do
         :ok ->
           case Socket.Web.recv!(websocket) do
-            {:text, text} ->
-              parsed_text = M.dec!(text)
-              f.(parsed_text)
-              {:ok, parsed_text}
+            {:text, text} -> {:ok, M.dec!(text)}
             {:ping, _} -> Socket.Web.send!(websocket, {:pong, ""})
           end
       end

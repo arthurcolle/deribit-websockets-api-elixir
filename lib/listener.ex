@@ -14,8 +14,8 @@ defmodule Deribit.Listener do
       {:ping, _} ->
         Socket.Web.send!(websocket, {:pong, ""})
 
-      msg ->
-        Logger.debug("I received a msg...\n`#{msg}`")
+      _msg ->
+        Logger.debug("I received a msg.\n#{_msg}")
     end
 
     receive do
@@ -28,10 +28,13 @@ defmodule Deribit.Listener do
         Logger.debug("1) closing socket")
         Socket.Web.close(websocket)
         Logger.debug("2) killing receiver proc")
-        Process.exit(self(), reason)
+        Process.exit(self, reason)
 
       {:ping, _x} ->
         {:pong, Time.utc_now()}
     end
   end
 end
+
+# Deribit.API.WebSockets.start_link(); Deribit.API.WebSockets.authenticate(Deribit.client_id(), Deribit.client_secret())
+# pid = Deribit.subscribe(%{"channels" => ["book.BTC-27DEC19-13000-C.raw"]})
