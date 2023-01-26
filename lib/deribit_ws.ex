@@ -21,14 +21,18 @@ defmodule Deribit.API.WebSockets do
     )
   end
 
+  def data do
+    Agent.get(__MODULE__, fn x -> x end)
+  end
+
   def socket do
     Agent.get(__MODULE__, fn x -> Map.get(x, "websocket") end)
   end
 
   def obtain_result(text) do
-    # I'm looking for an access_token
     json = M.dec!(text)
 
+    # I'm looking for a map with a result entry
     case Map.has_key?(json, "result") do
       true ->
         result = Map.get(json, "result")
@@ -37,12 +41,9 @@ defmodule Deribit.API.WebSockets do
 
         case access && refresh do
           true -> result
-          _ -> raise "no results"
         end
-
-      false ->
-        raise "no results"
     end
+    nil
   end
 
   ####### Authentication section
@@ -92,13 +93,13 @@ defmodule Deribit.API.WebSockets do
           :ok ->
             case Socket.Web.recv!(websocket) do
               {:text, text} ->
-                IO.inspect(text)
+                dec_text = M.dec!(text)
+                IO.inspect(dec_text)
                 {:ok, Map.put(data, "result", obtain_result(text))}
-
               {:ping, _} ->
                 {Socket.Web.send!(websocket, {:pong, ""}), data}
-
               abc ->
+                IO.puts "This is abc..."
                 IO.inspect(abc)
             end
 
@@ -106,6 +107,7 @@ defmodule Deribit.API.WebSockets do
             raise "Error!"
 
           x ->
+            IO.puts "This is x..."
             IO.inspect(x)
         end
       end)
@@ -126,7 +128,6 @@ defmodule Deribit.API.WebSockets do
           "params" => params
         }
 
-        IO.inspect(pub)
         pub
 
       :private ->
@@ -135,7 +136,6 @@ defmodule Deribit.API.WebSockets do
           "params" => params
         }
 
-        IO.inspect(prv)
         prv
     end
   end
@@ -154,7 +154,7 @@ defmodule Deribit.API.WebSockets do
             {:text, text} ->
               parsed_text = M.dec!(text)
               f.(parsed_text)
-              {:ok, spawn(Deribit.Listener, :listen, [websocket, f])}
+              {:ok, spawn(Deribit.Listener, :listen, [websocket, data, f])}
             {:ping, _} ->
               Socket.Web.send!(websocket, {:pong, ""})
             other ->

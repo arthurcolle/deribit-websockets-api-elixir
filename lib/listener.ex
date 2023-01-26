@@ -1,12 +1,16 @@
 defmodule Deribit.Listener do
   require Logger
 
-  def listen(websocket, f) do
+  def listen(websocket, data, f) do
+
     case Socket.Web.recv!(websocket) do
       {:text, text} ->
         parsed_text = M.dec!(text)
-        f.(parsed_text)
-        listen(websocket, f)
+        case f do
+          nil -> nil
+          _ -> f.(parsed_text)
+        end
+        listen(websocket, Map.put(data, Time.utc_now(), parsed_text), f)
       {:ping, _} ->
         Socket.Web.send!(websocket, {:pong, ""})
 
@@ -15,6 +19,7 @@ defmodule Deribit.Listener do
     end
 
     receive do
+      {:data} -> IO.inspect data
       {:time} ->
         Time.utc_now()
 

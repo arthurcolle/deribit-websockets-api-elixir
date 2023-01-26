@@ -1,6 +1,7 @@
 # Deribit
 
 Client for the [Deribit API v2](https://docs.deribit.com/v2/) over a secure WebSocket connection.
+
 Adaptation and expansion of earlier work done by @gabrielpra1.
 ## Installation
 
@@ -41,6 +42,7 @@ iex(1)> Deribit.test
    "usIn" => 1556750102206871,
    "usOut" => 1556750102206872
  }}
+ 
 iex(2)> Deribit.test %{expected_result: "exception"}
 {:error,
  {500,
@@ -91,7 +93,7 @@ Deribit.API.WebSockets.start_link();
 Deribit.API.WebSockets.authenticate(Deribit.client_id(), Deribit.client_secret())
 ```
 
-## Just display bids
+## Just display bids  
 ```
 {:ok, pid} = Deribit.subscribe(%{"channels" => ["book.BTC-PERPETUAL.raw"]}, fn(x) -> IO.inspect(x["params"]["data"]) end)
 ```

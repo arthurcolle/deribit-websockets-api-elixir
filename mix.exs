@@ -32,6 +32,7 @@ defmodule Deribit.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:httpoison, "~> 1.4"},
       {:jason, "~> 1.1"},
       {:socket, "~> 0.3.13"},
