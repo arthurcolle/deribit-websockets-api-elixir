@@ -2,9 +2,20 @@ defmodule DeribitApi.API.WebSockets do
   @moduledoc """
     Deribit WebSockets API.
   """
+  use Agent
 
   require Logger
   @api_v2 "/ws/api/v2"
+
+  def child_spec(opts) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, [opts]},
+      type: :worker,
+      restart: :permanent,
+      shutdown: 500
+    }
+  end
 
   def start_link do
     Agent.start_link(
@@ -138,6 +149,7 @@ defmodule DeribitApi.API.WebSockets do
 
   # def ws, do: Agent.get(__MODULE__, fn data -> Map.get(data, "websocket") end)
 
+  @spec get_public(any, any, any) :: any
   def get_public(url, params \\ %{}, f) do
     Agent.get(__MODULE__, fn data ->
       IO.inspect(data)
